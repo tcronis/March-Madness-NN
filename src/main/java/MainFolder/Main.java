@@ -32,5 +32,10 @@ public class Main {
         neuralNetwork2.calculate();
         // get network output
         double[] networkOutput = neuralNetwork2.getOutput();
+        
+        
+        //AccessDatabase ad = new AccessDatabase();
+        //ad.connectToDatabase();
+        
     }
 }
