@@ -9,6 +9,12 @@
   <properties>
     <neuroph.version>2.94</neuroph.version>
   </properties>
+  <repositories>
+    <repository>
+        <id>neuroph.sourceforge.net</id>
+        <url>http://neuroph.sourceforge.net/maven2/</url>
+    </repository>    
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -16,10 +22,21 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>org.neuroph</groupId>
       <artifactId>neuroph</artifactId>
       <version>${neuroph.version}</version>
+    </dependency> -->
+    <dependency>
+       <groupId>org.slf4j</groupId>
+       <artifactId>slf4j-simple</artifactId>
+       <version>1.7.21</version>
+       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.neuroph</groupId>
+      <artifactId>neuroph-core</artifactId>
+      <version>2.94</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
     <dependency>

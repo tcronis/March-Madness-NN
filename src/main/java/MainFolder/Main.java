@@ -1,8 +1,12 @@
 package MainFolder;
 
+// import org.neuroph.core.*;
+// import org.neuroph.core.data.*;
+// import org.neuroph.nnet.*;
+
 import org.neuroph.core.*;
-import org.neuroph.core.data.*;
 import org.neuroph.nnet.*;
+import org.neuroph.core.data.*;
 
 public class Main {
     public static void main( String[] args ) {
@@ -36,6 +40,5 @@ public class Main {
         
         //AccessDatabase ad = new AccessDatabase();
         //ad.connectToDatabase();
-        
     }
 }
