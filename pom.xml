@@ -8,6 +8,8 @@
   <url>http://maven.apache.org</url>
   <properties>
     <neuroph.version>2.94</neuroph.version>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
   </properties>
   <dependencies>
     <dependency>
@@ -26,6 +28,12 @@
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
       <version>7.2.1.jre11</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>4.5</version>
     </dependency>
   </dependencies>
 </project>
