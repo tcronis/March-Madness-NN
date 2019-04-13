@@ -1,0 +1,53 @@
+Division IWon-Lost Percentage
+"Rank","Name","W","L","Pct"
+
+Division IScoring Offense
+"Rank","Name","GM","W-L","PTS","PPG"
+
+Division IScoring Defense
+"Rank","Name","GM","W-L","OPP PTS","OPP PPG"
+
+Division IScoring Margin
+"Rank","Name","GM","W-L","PTS","PPG","OPP PTS","OPP PPG","SCR MAR"
+
+Division IField-Goal Percentage
+"Rank","Name","GM","W-L","FGM","FGA","FG%"
+
+Division IField-Goal Percentage Defense
+"Rank","Name","GM","W-L","OPP FG","OPP FGA","OPP FG%"
+
+Division IThree-Point Field Goals Per Game
+"Rank","Name","GM","W-L","3FG","3PG"
+
+Division IThree-Point Field-Goal Percentage
+"Rank","Name","GM","W-L","3FG","3FGA","3FG%"
+
+Division IThree Pt FG Defense
+"Rank","Name","GM","W-L","Opp 3FGA","Opp 3FG","Pct"
+
+Division IFree-Throw Percentage
+"Rank","Name","GM","W-L","FT","FTA","FT%"
+
+Division IRebound Margin
+"Rank","Name","GM","W-L","REB","RPG","OPP REB","OPP RPG","REB MAR"
+
+Division IAssists Per Game
+"Rank","Name","GM","W-L","AST","APG"
+
+Division IAssist Turnover Ratio
+"Rank","Name","GM","W-L","AST","TO","Ratio"
+
+Division IBlocked Shots Per Game
+"Rank","Name","GM","W-L","BLKS","BKPG"
+
+Division ISteals Per Game
+"Rank","Name","GM","W-L","ST","STPG"
+
+Division ITurnovers Per Game
+"Rank","Name","GM","W-L","TO","TOPG"
+
+Division ITurnover Margin
+"Rank","Name","GM","W-L","Opp TO","TO","Ratio"
+
+Division IPersonal Fouls Per Game
+"Rank","Name","GM","W-L","Fouls","PFPG","DQ"
