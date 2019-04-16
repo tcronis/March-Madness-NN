@@ -1,0 +1,69 @@
+Won-Lost Percentage
+"Rank","Name","W","L","Pct"
+
+
+Scoring Offense
+"Rank","Name","GM","W-L","PTS","PPG"
+
+
+Scoring Defense
+"Rank","Name","GM","W-L","OPP PTS","OPP PPG"
+
+
+Scoring Margin
+"Rank","Name","GM","W-L","PTS","PPG","OPP PTS","OPP PPG","SCR MAR"
+
+
+Field-Goal Percentage
+"Rank","Name","GM","W-L","FGM","FGA","FG%"
+
+Field-Goal Percentage Defense
+"Rank","Name","GM","W-L","OPP FG","OPP FGA","OPP FG%"
+
+
+Three-Point Field Goals Per Game
+"Rank","Name","GM","W-L","3FG","3PG"
+
+
+Three-Point Field-Goal Percentage
+"Rank","Name","GM","W-L","3FG","3FGA","3FG%"
+
+
+Three Pt FG Defense
+"Rank","Name","GM","W-L","Opp 3FGA","Opp 3FG","Pct"
+
+
+Free-Throw Percentage
+"Rank","Name","GM","W-L","FT","FTA","FT%"
+
+
+Rebound Margin
+"Rank","Name","GM","W-L","REB","RPG","OPP REB","OPP RPG","REB MAR"
+
+
+Assists Per Game
+"Rank","Name","GM","W-L","AST","APG"
+
+
+Assist Turnover Ratio
+"Rank","Name","GM","W-L","AST","TO","Ratio"
+
+
+Blocked Shots Per Game
+"Rank","Name","GM","W-L","BLKS","BKPG"
+
+
+Steals Per Game
+"Rank","Name","GM","W-L","ST","STPG"
+
+
+Turnovers Per Game
+"Rank","Name","GM","W-L","TO","TOPG"
+
+
+Turnover Margin
+"Rank","Name","GM","W-L","Opp TO","TO","Ratio"
+
+
+Personal Fouls Per Game
+"Rank","Name","GM","W-L","Fouls","PFPG","DQ"

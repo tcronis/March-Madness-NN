@@ -1,15 +1,14 @@
 package MainFolder;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -17,13 +16,18 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
 public class AccessDatabase {    
+
+    //final String WIN_LOSS_2019 = "C:\\Users\\Kespe\\March-Madness-NN\\resources\\reg_season_data\\test.csv";
     
     public AccessDatabase() {
 
     }
 
-    public void connectToDatabase() {
-        
+    //****************************************************************************
+    //This collection of functions will read the CSV data by statistical category
+    //****************************************************************************
+    public void fillTables() throws SQLException {        
+
         Connection dbConnection = null;
         
         try {
@@ -40,41 +44,40 @@ public class AccessDatabase {
         } catch (SQLException e) {
             System.out.println("ERROR, SQL EXCEPTION");
             System.exit(2);
+        }        
+        
+        for (int i = 2015; i < 2020; i++) {
+            String year = Integer.toString(i);
+            winLossPercent(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/win_loss.csv"));
+            offensiveScoring(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/scoring_offense.csv"));
+            defensiveScoring(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/scoring_defense.csv"));
+            scoringMargin(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/scoring_margin.csv"));
+            fieldGoalPercent(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/fg_percent_off.csv"));
+            fieldGoalPercentDefense(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/fg_percent_def.csv"));
+            threePointsPerGame(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/3p_game.csv"));
+            threePointPercentage(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/3p_percent.csv"));
+            threePointPercentageDefense(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/3p_defense.csv"));
+            freeThrowPercentage(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/free_throw_percent.csv"));
+            reboundMargin(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/rebound_margin.csv"));
+            assistsPerGame(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/assist_game.csv"));
+            assistTurnoverRatio(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/assist_turn_ratio.csv"));
+            blocksPerGame(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/blocks_game.csv"));
+            stealsPerGame(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/steals_game.csv"));
+            turnoversPerGame(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/turnovers_game.csv"));
+            turnoverMargin(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/turnover_margin.csv"));
+            foulsPerGame(dbConnection, year, readCSV("resources/reg_season_data/" + year + "/fouls_game.csv"));
         }
     }
 
-    //****************************************************************************
-    //This collection of functions will read the CSV data by statistical category
-    //****************************************************************************
-    public void fillTables(Connection dbConnection) throws SQLException {        
-
-        winLossPercent(dbConnection);
-        offensiveScoring(dbConnection);
-        defensiveScoring(dbConnection);
-        fieldGoalPercent(dbConnection);
-        fieldGoalPercentDefense(dbConnection);
-        threePointsPerGame(dbConnection);
-        threePointPercentage(dbConnection);
-        threePointPercentageDefense(dbConnection);
-        freeThrowPercentage(dbConnection);
-        reboundMargin(dbConnection);
-        assistsPerGame(dbConnection);
-        assistTurnoverRatio(dbConnection);
-        blocksPerGame(dbConnection);
-        stealsPerGame(dbConnection);
-        turnoversPerGame(dbConnection);
-        turnoverMargin(dbConnection);
-        foulsPerGame(dbConnection);
-    }
-
-    private void readCSV(String path) {
-        
+    private ArrayList<String[]> readCSV(String path) {
+        ArrayList<String[]> nextItem = null;
         Path csvPath = Paths.get(path);        
+        //System.out.println(csvPath);
 
         CSVParser parser = new CSVParserBuilder()
         .withSeparator(',')
         .withIgnoreQuotations(true)
-        .withEscapeChar('l') //gonna have to delimit each file myself.
+        .withIgnoreLeadingWhiteSpace(false)
         .build();
 
         try {
@@ -82,76 +85,559 @@ public class AccessDatabase {
             CSVReader reader = new CSVReaderBuilder(br)
             .withCSVParser(parser)
             .build();
-        } catch (IOException e) {};
 
-        
+            String[] nextLine;
+            nextItem = new ArrayList<String[]>();
+
+            while ((nextLine = reader.readNext()) != null) {
+                if (nextLine.length == 1)
+                    continue;
+                nextItem.add(nextLine);          
+            }              
+        } catch (IOException e) {
+            System.out.println("[AD] IOException");
+        };    
+        return nextItem;   
     }
 
-    private void winLossPercent(Connection dbConnection) {
-        
-        try {
-            String query = "INSERT INTO winLossPercent VALUES ()";
-            Statement statement = dbConnection.createStatement();
-            statement.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }       
+    private void winLossPercent(Connection dbConnection, String year, ArrayList<String[]> csvData) {        
+        for (String[] data : csvData) {
+            int numOfWins = Integer.valueOf(data[2]);
+            int numOfLosses = Integer.valueOf(data[3]);
+            double percentage = Double.valueOf(data[4]);
+            BigDecimal roundedPercentage = BigDecimal.valueOf(percentage).setScale(3, RoundingMode.CEILING); 
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT winLossPercent (YEAR, TEAM_NAME, NUM_WINS, NUM_LOSSES, WIN_PERCENTAGE)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfWins + "," +
+                numOfLosses + "," +
+                roundedPercentage +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }           
     }   
-    private void offensiveScoring(Connection dbConnection) {
-        
-    }
-    private void defensiveScoring(Connection dbConnection) {
-        
-    }
-    private void scoringMargin(Connection dbConnection) {
-        
-    }
-    private void fieldGoalPercent(Connection dbConnection) {
-        
-    }
-    private void fieldGoalPercentDefense(Connection dbConnection) {
-        
-    }
-    private void threePointsPerGame(Connection dbConnection) {
-        
-    }
-    private void threePointPercentage(Connection dbConnection) {
-        
-    }
-    private void threePointPercentageDefense(Connection dbConnection) {
-        
-    }
-    private void freeThrowPercentage(Connection dbConnection) {
-        
-    }
-    private void reboundMargin(Connection dbConnection) {
-        
-    }
-    private void assistsPerGame(Connection dbConnection) {
-        
-    }
-    private void assistTurnoverRatio(Connection dbConnection) {
-        
-    }
-    private void blocksPerGame(Connection dbConnection) {
-        
-    }
-    private void stealsPerGame(Connection dbConnection) {
-        
-    }
-    private void turnoversPerGame(Connection dbConnection) {
-        
-    }
-    private void turnoverMargin(Connection dbConnection) {
-        
-    }
-    private void foulsPerGame(Connection dbConnection) {
-        
-    }
+    private void offensiveScoring(Connection dbConnection, String year, ArrayList<String[]> csvData) {        
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfPoints = Integer.valueOf(data[4]);
+            BigDecimal avgPoints = BigDecimal.valueOf((double)numOfPoints/numOfGames).setScale(3, RoundingMode.CEILING); 
 
-    // ResultSet dbResponse = statement.executeQuery(query);//send the query, then store the db response
-    //     while (dbResponse.next()) {
-    //         System.out.println(""+dbResponse.getInt("ID") + "\t, "+dbResponse.getString("RANKING")+"\t"+dbResponse.getString("COLLEGE")+
-    //         "\t"+dbResponse.getString("WIN")+"\t"+dbResponse.getString("LOSS")+"\t"+dbResponse.getString("PCT")+"\n");
-    //     }
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT offensiveScoring (YEAR, TEAM_NAME, NUM_GAMES, NUM_POINTS, AVG_POINTS_PER_GAME)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfPoints + "," +
+                avgPoints +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }           
+    }
+    private void defensiveScoring(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfPoints = Integer.valueOf(data[4]);
+            BigDecimal avgPoints = BigDecimal.valueOf((double)numOfPoints/numOfGames).setScale(3, RoundingMode.CEILING); 
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT defensiveScoring (YEAR, TEAM_NAME, NUM_GAMES, NUM_OPPONENT_POINTS, AVG_OPPONENT_POINTS_PER_GAME)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfPoints + "," +
+                avgPoints +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }           
+    }
+    private void scoringMargin(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfPoints = Integer.valueOf(data[4]);
+            int oppPoints = Integer.valueOf(data[6]);
+            BigDecimal avgPointsPerGame = BigDecimal.valueOf((double)numOfPoints/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal avgOppPointsPerGame = BigDecimal.valueOf((double)oppPoints/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal margin = avgPointsPerGame.subtract(avgOppPointsPerGame).setScale(3, RoundingMode.CEILING); 
+            int scoringMarginSeason = numOfPoints - oppPoints;
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT scoringMargin (YEAR, TEAM_NAME, NUM_GAMES, NUM_POINTS, NUM_OPPONENT_POINTS, SCORING_MARGIN_PER_GAME, SCORING_MARGIN_SEASON)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfPoints + "," +
+                oppPoints + "," +
+                margin + "," +
+                scoringMarginSeason +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }           
+    }
+    private void fieldGoalPercent(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfFgMade = Integer.valueOf(data[4]);
+            int numOfFgAttempts = Integer.valueOf(data[5]);
+            BigDecimal numOfFgGame = BigDecimal.valueOf((double)numOfFgMade/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal numOfFgAttemptsGame = BigDecimal.valueOf((double)numOfFgAttempts/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal fgPercent = BigDecimal.valueOf((double)numOfFgMade/numOfFgAttempts).setScale(3, RoundingMode.CEILING); 
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT fieldGoalPercent (YEAR, TEAM_NAME, NUM_GAMES, NUM_FG_MADE, NUM_FG_PER_GAME, NUM_FG_ATTEMPTS, NUM_FG_ATTEMPTS_PER_GAME, FG_PERCENTAGE)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfFgMade + "," +
+                numOfFgGame + "," +
+                numOfFgAttempts + "," +
+                numOfFgAttemptsGame + "," +
+                fgPercent +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void fieldGoalPercentDefense(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfFgMade = Integer.valueOf(data[4]);
+            int numOfFgAttempts = Integer.valueOf(data[5]);
+            BigDecimal numOfFgGame = BigDecimal.valueOf((double)numOfFgMade/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal numOfFgAttemptsGame = BigDecimal.valueOf((double)numOfFgAttempts/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal fgPercent = BigDecimal.valueOf((double)numOfFgMade/numOfFgAttempts).setScale(3, RoundingMode.CEILING); 
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT fieldGoalPercentDefense (YEAR, TEAM_NAME, NUM_GAMES, NUM_OPP_FG_MADE, NUM_OPP_FG_ATTEMPTS, NUM_OPP_FG_PER_GAME, NUM_OPP_FG_ATTEMPTS_PER_GAME, OPP_FG_PERCENTAGE)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfFgMade + "," +
+                numOfFgAttempts + "," +
+                numOfFgGame + "," +
+                numOfFgAttemptsGame + "," +
+                fgPercent +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void threePointsPerGame(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfThreePointersMade = Integer.valueOf(data[4]);
+            BigDecimal threePointsPerGame = BigDecimal.valueOf((double)numOfThreePointersMade/numOfGames).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT threePointsPerGame (YEAR, TEAM_NAME, NUM_GAMES, NUM_3P_MADE, NUM_3P_PER_GAME)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfThreePointersMade + "," +
+                threePointsPerGame +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void threePointPercentage(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfThreePointersMade = Integer.valueOf(data[4]);
+            int numOfAttempts = Integer.valueOf(data[5]);
+            BigDecimal threePointsPerGame = BigDecimal.valueOf((double)numOfThreePointersMade/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal threePointsAttPerGame = BigDecimal.valueOf((double)numOfAttempts/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal threePointsPct = BigDecimal.valueOf((double)numOfThreePointersMade/numOfAttempts).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT threePointPercentage (YEAR, TEAM_NAME, NUM_GAMES, NUM_3P_MADE, NUM_3P_ATTEMPTS, NUM_3P_PER_GAME, NUM_3P_ATTEMPTS_PER_GAME, T3P_PERCENTAGE)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfThreePointersMade + "," +
+                numOfAttempts + "," +
+                threePointsPerGame + "," +
+                threePointsAttPerGame + "," +
+                threePointsPct +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void threePointPercentageDefense(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfThreePointersMade = Integer.valueOf(data[5]);
+            int numOfAttempts = Integer.valueOf(data[4]);
+            BigDecimal threePointsPerGame = BigDecimal.valueOf((double)numOfThreePointersMade/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal threePointsAttPerGame = BigDecimal.valueOf((double)numOfAttempts/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal threePointsPct = BigDecimal.valueOf((double)numOfThreePointersMade/numOfAttempts).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT threePointPercentageDefense (YEAR, TEAM_NAME, NUM_GAMES, NUM_OPP_3P_MADE, NUM_OPP_3P_ATTEMPTS, NUM_OPP_3P_PER_GAME, NUM_OPP_3P_ATTEMPTS_PER_GAME, OPP_3P_PERCENTAGE)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfThreePointersMade + "," +
+                numOfAttempts + "," +
+                threePointsPerGame + "," +
+                threePointsAttPerGame + "," +
+                threePointsPct +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void freeThrowPercentage(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfFtMade = Integer.valueOf(data[4]);
+            int numOfFtAttempts = Integer.valueOf(data[5]);
+            BigDecimal numOfFtGame = BigDecimal.valueOf((double)numOfFtMade/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal numOfFtAttemptsGame = BigDecimal.valueOf((double)numOfFtAttempts/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal ftPercent = BigDecimal.valueOf((double)numOfFtMade/numOfFtAttempts).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT freeThrowPercentage (YEAR, TEAM_NAME, NUM_GAMES, NUM_FT_MADE, NUM_FT_ATTEMPTS, NUM_FT_PER_GAME, NUM_FT_ATTEMPTS_PER_GAME, FT_PERCENTAGE)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfFtMade + "," +
+                numOfFtAttempts + "," +
+                numOfFtGame + "," +
+                numOfFtAttemptsGame + "," +
+                ftPercent +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void reboundMargin(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfRebounds = Integer.valueOf(data[4]);
+            int numOfOppRebounds = Integer.valueOf(data[6]);
+            BigDecimal reboundsGame = BigDecimal.valueOf((double)numOfRebounds/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal oppReboundsGame = BigDecimal.valueOf((double)numOfOppRebounds/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal reboundMargin = reboundsGame.subtract(oppReboundsGame).setScale(3,  RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT reboundMargin (YEAR, TEAM_NAME, NUM_GAMES, NUM_REBOUNDS, REBOUNDS_PER_GAME, OPP_NUM_REBOUNDS, OPP_REBOUNDS_PER_GAME, REBOUND_MARGIN)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfRebounds + "," +
+                reboundsGame + "," +
+                numOfOppRebounds + "," +
+                oppReboundsGame + "," +
+                reboundMargin +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void assistsPerGame(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfAssists = Integer.valueOf(data[4]);
+            BigDecimal assistsPerGame = BigDecimal.valueOf((double)numOfAssists/numOfGames).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT assistsPerGame (YEAR, TEAM_NAME, NUM_GAMES, NUM_ASSISTS, ASSISTS_PER_GAME)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfAssists + "," +
+                assistsPerGame +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void assistTurnoverRatio(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfAssists = Integer.valueOf(data[4]);
+            int numOfTurnovers = Integer.valueOf(data[5]);
+            BigDecimal ratio = BigDecimal.valueOf((double)numOfAssists/numOfTurnovers).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT assistTurnoverRatio (YEAR, TEAM_NAME, NUM_GAMES, NUM_ASSISTS, NUM_TURNOVERS, ATO_RATIO)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfAssists + "," +
+                numOfTurnovers + "," +
+                ratio +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void blocksPerGame(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfBlocks = Integer.valueOf(data[4]);
+            BigDecimal blocksPerGame = BigDecimal.valueOf((double)numOfBlocks/numOfGames).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT blocksPerGame (YEAR, TEAM_NAME, NUM_GAMES, NUM_BLOCKS, BLOCKS_PER_GAME)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfBlocks + "," +
+                blocksPerGame +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void stealsPerGame(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfSteals = Integer.valueOf(data[4]);
+            BigDecimal stealsPerGame = BigDecimal.valueOf((double)numOfSteals/numOfGames).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT stealsPerGame (YEAR, TEAM_NAME, NUM_GAMES, NUM_STEALS, STEALS_PER_GAME)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfSteals + "," +
+                stealsPerGame +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void turnoversPerGame(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfTurnovers = Integer.valueOf(data[4]);
+            BigDecimal turnoversPerGame = BigDecimal.valueOf((double)numOfTurnovers/numOfGames).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT turnoversPerGame (YEAR, TEAM_NAME, NUM_GAMES, NUM_TURNOVERS, TURNOVERS_PER_GAME)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfTurnovers + "," +
+                turnoversPerGame +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void turnoverMargin(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfOppTurnovers = Integer.valueOf(data[4]);
+            int numOfTurnovers = Integer.valueOf(data[5]);
+            BigDecimal turnoversGame = BigDecimal.valueOf((double)numOfTurnovers/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal oppTurnoversGame = BigDecimal.valueOf((double)numOfOppTurnovers/numOfGames).setScale(3, RoundingMode.CEILING);
+            BigDecimal turnoverMargin = turnoversGame.subtract(oppTurnoversGame).setScale(3,  RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT turnoverMargin (YEAR, TEAM_NAME, NUM_GAMES, NUM_TURNOVERS, TURNOVERS_PER_GAME, OPP_NUM_TURNOVERS, OPP_TURNOVERS_PER_GAME, TURNOVER_MARGIN)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfTurnovers + "," +
+                turnoversGame + "," +
+                numOfOppTurnovers + "," +
+                oppTurnoversGame + "," +
+                turnoverMargin +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
+    private void foulsPerGame(Connection dbConnection, String year, ArrayList<String[]> csvData) {
+        for (String[] data : csvData) {
+            int numOfGames = Integer.valueOf(data[2]);
+            int numOfFouls = Integer.valueOf(data[4]);
+            int dq = Integer.valueOf(data[6]);
+            BigDecimal foulsPerGame = BigDecimal.valueOf((double)numOfFouls/numOfGames).setScale(3, RoundingMode.CEILING);
+
+            if (data[1].contains("\'"))
+                data[1] = data[1].replace("\'", "");
+
+            try {
+                //System.out.println(data[1]);
+                String query = "INSERT foulsPerGame (YEAR, TEAM_NAME, NUM_GAMES, NUM_FOULS, FOULS_PER_GAME, NUM_DQ)"
+                + "VALUES(" +
+                Integer.valueOf(year) + "," +
+                "'" + data[1] + "'," +
+                numOfGames + "," +
+                numOfFouls + "," +
+                foulsPerGame + "," +
+                dq +
+                ");" + "\n"
+                ;
+                Statement statement = dbConnection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }    
+        }
+    }
 }
