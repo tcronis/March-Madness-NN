@@ -57,6 +57,8 @@ public class NeuralNetMM{
         // trainingSet. addRow (new DataSetRow (new String[]{0, 0}, new double[]{0}));    
     }
 
+
+
     public void trainingOnOneInput(String input){
 
     }
@@ -72,8 +74,23 @@ public class NeuralNetMM{
     }
 
     public void openNetworkFromFile(String fileNetworkName){
-        networkName = fileNetworkName;
-        network = NeuralNetwork.createFromFile(fileNetworkName);
+        
+        try{
+            network = NeuralNetwork.createFromFile(fileNetworkName);
+            networkName = fileNetworkName;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        
     }
 
+
+
+    public double [] getOutput(){
+        if(!network.isEmpty()){
+            return network.getOutput();
+        }
+        else{
+            return null;
+        }
 }
