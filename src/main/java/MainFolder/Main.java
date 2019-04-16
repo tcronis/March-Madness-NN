@@ -1,6 +1,9 @@
 package MainFolder;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.neuroph.core.*;
 import org.neuroph.core.data.*;
@@ -10,8 +13,39 @@ public class Main {
     public static void main( String[] args ) {
         
         AccessDatabase ad = new AccessDatabase();
-        try {
-            ad.fillTables();
+        Map<String, Double> result, result2;
+        List<String> teamNames;
+
+        try { 
+            //ad.fillTables();
+            
+            System.out.println("WL: " + ad.getWinLoss(2015, "Kentucky"));
+            result = ad.getWinLoss(2015, "Kentucky");
+            System.out.println(result.get("NUM_WINS"));
+            System.out.println(result.get("NUM_LOSSES")); 
+            System.out.println(result.get("WIN_PERCENTAGE"));
+            System.out.println(result.values());
+
+            System.out.println("\nOS: " + ad.getOffensiveScoring(2015, "Kentucky"));
+            result2 = ad.getOffensiveScoring(2015, "Kentucky");
+            System.out.println(result2.get("AVG_POINTS_PER_GAME"));
+            System.out.println(result2.get("NUM_GAMES")); 
+            System.out.println(result2.get("NUM_POINTS"));
+
+            result.putAll(result2);
+            System.out.println("MERGED: " + result);
+
+            System.out.println("\nDS: " + ad.getDefensiveScoring(2015, "Kentucky"));
+            System.out.println("\nSM: " + ad.getScoringMargin(2015, "Kentucky"));
+            System.out.println("\nFGP: " + ad.getFieldGoalPercent(2015, "Kentucky"));
+            System.out.println("\n\n");
+            
+            
+            teamNames = ad.getAllTeamsByYear(2015);
+            
+            for (String college : teamNames) {
+                System.out.println(college + ": " + ad.getWinLoss(2015, college));
+            }
         } catch (SQLException e) {}; 
         
         // // create new perceptron network
