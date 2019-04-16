@@ -660,6 +660,273 @@ public class AccessDatabase {
         return returnList;
     }
 
+    public Map<String, Double> getFieldGoalPercentDefense(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_OPP_FG_MADE, NUM_OPP_FG_ATTEMPTS, NUM_OPP_FG_PER_GAME, NUM_OPP_FG_ATTEMPTS_PER_GAME, OPP_FG_PERCENTAGE " + 
+                       "FROM fieldGoalPercentDefense " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_OPP_FG_MADE", (double)rs.getInt("NUM_OPP_FG_MADE"));
+            returnList.put("NUM_OPP_FG_ATTEMPTS", (double)rs.getInt("NUM_OPP_FG_ATTEMPTS"));
+            returnList.put("NUM_OPP_FG_PER_GAME", rs.getDouble("NUM_OPP_FG_PER_GAME"));  
+            returnList.put("NUM_OPP_FG_ATTEMPTS_PER_GAME", rs.getDouble("NUM_OPP_FG_ATTEMPTS_PER_GAME"));
+            returnList.put("OPP_FG_PERCENTAGEs", rs.getDouble("OPP_FG_PERCENTAGE"));                      
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getThreePointsPerGame(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_3P_MADE, NUM_3P_PER_GAME " + 
+                       "FROM threePointsPerGame " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_3P_MADE", (double)rs.getInt("NUM_3P_MADE"));
+            returnList.put("NUM_3P_PER_GAME", rs.getDouble("NUM_3P_PER_GAME"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getThreePointPercentage(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_3P_MADE, NUM_3P_ATTEMPTS, NUM_3P_PER_GAME, NUM_3P_ATTEMPTS_PER_GAME, T3P_PERCENTAGE " + 
+                       "FROM threePointPercentage " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_3P_MADE", (double)rs.getInt("NUM_3P_MADE"));
+            returnList.put("NUM_3P_ATTEMPTS", (double)rs.getInt("NUM_3P_ATTEMPTS"));
+            returnList.put("NUM_3P_PER_GAME", rs.getDouble("NUM_3P_PER_GAME"));
+            returnList.put("NUM_3P_ATTEMPTS_PER_GAME", rs.getDouble("NUM_3P_ATTEMPTS_PER_GAME"));
+            returnList.put("T3P_PERCENTAGE", rs.getDouble("T3P_PERCENTAGE"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getThreePointPercentageDefense(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_OPP_3P_MADE, NUM_OPP_3P_ATTEMPTS, NUM_OPP_3P_PER_GAME, NUM_OPP_3P_ATTEMPTS_PER_GAME, OPP_3P_PERCENTAGE " + 
+                       "FROM threePointPercentageDefense " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_OPP_3P_MADE", (double)rs.getInt("NUM_OPP_3P_MADE"));
+            returnList.put("NUM_OPP_3P_ATTEMPTS", (double)rs.getInt("NUM_OPP_3P_ATTEMPTS"));
+            returnList.put("NUM_OPP_3P_PER_GAME", rs.getDouble("NUM_OPP_3P_PER_GAME"));
+            returnList.put("NUM_OPP_3P_ATTEMPTS_PER_GAME", rs.getDouble("NUM_OPP_3P_ATTEMPTS_PER_GAME"));
+            returnList.put("OPP_3P_PERCENTAGE", rs.getDouble("OPP_3P_PERCENTAGE"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getFreeThrowPercentage(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_FT_MADE, NUM_FT_ATTEMPTS, NUM_FT_PER_GAME, NUM_FT_ATTEMPTS_PER_GAME, FT_PERCENTAGE " + 
+                       "FROM freeThrowPercentage " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_FT_MADE", (double)rs.getInt("NUM_FT_MADE"));
+            returnList.put("NUM_FT_ATTEMPTS", (double)rs.getInt("NUM_FT_ATTEMPTS"));
+            returnList.put("NUM_FT_PER_GAME", rs.getDouble("NUM_FT_PER_GAME"));
+            returnList.put("NUM_FT_ATTEMPTS_PER_GAME", rs.getDouble("NUM_FT_ATTEMPTS_PER_GAME"));
+            returnList.put("FT_PERCENTAGE", rs.getDouble("FT_PERCENTAGE"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getReboundMargin(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_REBOUNDS, REBOUNDS_PER_GAME, OPP_NUM_REBOUNDS, OPP_REBOUNDS_PER_GAME, REBOUND_MARGIN " + 
+                       "FROM reboundMargin " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_REBOUNDS", (double)rs.getInt("NUM_REBOUNDS"));            
+            returnList.put("REBOUNDS_PER_GAME", rs.getDouble("REBOUNDS_PER_GAME"));
+            returnList.put("OPP_NUM_REBOUNDS", (double)rs.getInt("OPP_NUM_REBOUNDS"));
+            returnList.put("OPP_REBOUNDS_PER_GAME", rs.getDouble("OPP_REBOUNDS_PER_GAME"));
+            returnList.put("REBOUND_MARGIN", rs.getDouble("REBOUND_MARGIN"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getAssistsPerGame(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_ASSISTS, ASSISTS_PER_GAME " + 
+                       "FROM assistsPerGame " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_ASSISTS", (double)rs.getInt("NUM_ASSISTS"));            
+            returnList.put("ASSISTS_PER_GAME", rs.getDouble("ASSISTS_PER_GAME"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getAssistTurnoverRatio(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_ASSISTS, NUM_TURNOVERS, ATO_RATIO " + 
+                       "FROM assistTurnoverRatio " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_ASSISTS", (double)rs.getInt("NUM_ASSISTS"));
+            returnList.put("NUM_TURNOVERS", (double)rs.getInt("NUM_TURNOVERS"));             
+            returnList.put("ATO_RATIO", rs.getDouble("ATO_RATIO"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getBlocksPerGame(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_BLOCKS, BLOCKS_PER_GAME " + 
+                       "FROM blocksPerGame " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_BLOCKS", (double)rs.getInt("NUM_BLOCKS"));             
+            returnList.put("BLOCKS_PER_GAME", rs.getDouble("BLOCKS_PER_GAME"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getStealsPerGame(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_STEALS, STEALS_PER_GAME " + 
+                       "FROM stealsPerGame " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_STEALS", (double)rs.getInt("NUM_STEALS"));             
+            returnList.put("STEALS_PER_GAME", rs.getDouble("STEALS_PER_GAME"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getTurnoversPerGame(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_TURNOVERS, TURNOVERS_PER_GAME " + 
+                       "FROM turnoversPerGame " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_TURNOVERS", (double)rs.getInt("NUM_TURNOVERS"));             
+            returnList.put("TURNOVERS_PER_GAME", rs.getDouble("TURNOVERS_PER_GAME"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getTurnoverMargin(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_TURNOVERS, TURNOVERS_PER_GAME, OPP_NUM_TURNOVERS, OPP_TURNOVERS_PER_GAME, TURNOVER_MARGIN " + 
+                       "FROM turnoverMargin " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_TURNOVERS", (double)rs.getInt("NUM_TURNOVERS"));             
+            returnList.put("TURNOVERS_PER_GAME", rs.getDouble("TURNOVERS_PER_GAME"));
+            returnList.put("OPP_NUM_TURNOVERS", (double)rs.getInt("OPP_NUM_TURNOVERS"));
+            returnList.put("OPP_TURNOVERS_PER_GAME", rs.getDouble("OPP_TURNOVERS_PER_GAME"));
+            returnList.put("TURNOVER_MARGIN", rs.getDouble("TURNOVER_MARGIN"));                       
+        }
+        return returnList;
+    }
+
+    public Map<String, Double> getFoulsPerGame(int year, String college) throws SQLException {
+        Statement statement = null;
+        Map<String, Double> returnList = new HashMap<String, Double>();
+
+        String query = "SELECT NUM_GAMES, NUM_FOULS, FOULS_PER_GAME, NUM_DQ " + 
+                       "FROM foulsPerGame " + 
+                       "WHERE TEAM_NAME = '" + college + "' "
+                     + "AND YEAR = " + year + ";\n";
+
+        statement = dbConnection.createStatement();
+        ResultSet rs = statement.executeQuery(query);
+        while (rs.next()) {
+            returnList.put("NUM_GAMES", (double)rs.getInt("NUM_GAMES"));
+            returnList.put("NUM_FOULS", (double)rs.getInt("NUM_FOULS"));             
+            returnList.put("FOULS_PER_GAME", rs.getDouble("FOULS_PER_GAME"));
+            returnList.put("NUM_DQ", (double)rs.getInt("NUM_DQ"));                       
+        }
+        return returnList;
+    }    
+
     public ArrayList<String> getAllTeamsByYear(int year) throws SQLException {
         Statement statement = null;
         ArrayList<String> returnList = new ArrayList<String>();

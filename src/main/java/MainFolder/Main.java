@@ -14,6 +14,7 @@ public class Main {
         
         AccessDatabase ad = new AccessDatabase();
         Map<String, Double> result, result2;
+        Map<String, Map<String, Double>> all2015Info;
         List<String> teamNames;
 
         try { 
@@ -38,14 +39,42 @@ public class Main {
             System.out.println("\nDS: " + ad.getDefensiveScoring(2015, "Kentucky"));
             System.out.println("\nSM: " + ad.getScoringMargin(2015, "Kentucky"));
             System.out.println("\nFGP: " + ad.getFieldGoalPercent(2015, "Kentucky"));
-            System.out.println("\n\n");
+            System.out.println("\n-----------------------------------------------------------------------------------");
             
-            
+            //nested map
+            all2015Info = new HashMap<String,Map<String,Double>>();
+
+            //an ArrayList<String>, getAllTeamsByYear() returns an ArrayList<String>
             teamNames = ad.getAllTeamsByYear(2015);
             
-            for (String college : teamNames) {
-                System.out.println(college + ": " + ad.getWinLoss(2015, college));
+            //iterate over every String in the above arraylist, recall it holds all the college names
+            for (String college : teamNames) {    
+                //get the winLoss of a college in the array list, store in a Map<String, Double>            
+                result = ad.getWinLoss(2015, college);
+                //merge the winLoss Map with the offensiveScoringMap, continue over every table type
+                result.putAll(ad.getOffensiveScoring(2015, college));
+                result.putAll(ad.getDefensiveScoring(2015, college));
+                result.putAll(ad.getScoringMargin(2015, college));
+                result.putAll(ad.getFieldGoalPercent(2015, college));
+                result.putAll(ad.getFieldGoalPercentDefense(2015, college));
+                result.putAll(ad.getThreePointsPerGame(2015, college));
+                result.putAll(ad.getThreePointPercentage(2015, college));
+                result.putAll(ad.getThreePointPercentageDefense(2015, college));
+                result.putAll(ad.getFreeThrowPercentage(2015, college));
+                result.putAll(ad.getReboundMargin(2015, college));
+                result.putAll(ad.getAssistsPerGame(2015, college));
+                result.putAll(ad.getAssistTurnoverRatio(2015, college));
+                result.putAll(ad.getBlocksPerGame(2015, college));
+                result.putAll(ad.getStealsPerGame(2015, college));
+                result.putAll(ad.getTurnoversPerGame(2015, college));
+                result.putAll(ad.getTurnoverMargin(2015, college));
+                result.putAll(ad.getFoulsPerGame(2015, college));
+                //put all the combined keys:values into a nested map. This maps key is the team/college
+                //name, its value is another map that holds NUM_GAMES, NUM_POINTS, etc.
+                all2015Info.put(college, result);
             }
+            //Print the values for College "SIUE"
+            System.out.println(all2015Info.get("SIUE"));
         } catch (SQLException e) {}; 
         
         // // create new perceptron network
