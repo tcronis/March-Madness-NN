@@ -74,7 +74,10 @@ public class Main {
                 all2015Info.put(college, result);
             }
             //Print the values for College "SIUE"
-            System.out.println(all2015Info.get("SIUE"));
+            System.out.println(all2015Info.get("SIUE").values());
+            Double[] test = all2015Info.get("SIUE").values().toArray(new Double[all2015Info.get("SIUE").size()]);
+            
+            
         } catch (SQLException e) {}; 
         
         // // create new perceptron network
