@@ -47,7 +47,10 @@ public class NeuralNetMM{
 
     
 
-    //expect a combined stirng array with name of the winner and then all of its double values
+    /* 
+        Expects two inputs, 
+    */
+
     public void trainingOnTwoInputs(Double [] value1, Double [] input2, Double winnerValue){
         
 
